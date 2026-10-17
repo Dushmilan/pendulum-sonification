@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pendulum sonification — motion, resampled into music</title>
+<meta name="description" content="An ideal pendulum swinging at about 1 Hz, resampled 256 times into the audible range and played back as music.">
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f1620; color: #dbe4ee;
+         font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 18px 48px; }
+  h1 { font-size: 20px; margin: 0 0 4px; font-weight: 650; }
+  .sub { color: #6b8099; font-size: 13px; margin: 0 0 16px; }
+  #stage { border: 1px solid #1e2b38; border-radius: 12px; overflow: hidden; background: #0b121a; }
+  canvas { display: block; width: 100%; height: auto; }
+  .bar { display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+         background: #121b26; border-top: 1px solid #1e2b38; }
+  button { font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+           border-radius: 8px; padding: 7px 14px; border: 1px solid #1e2b38;
+           background: #182430; color: #dbe4ee; }
+  button[aria-pressed="false"] { background: #38bdf8; border-color: #38bdf8; color: #04121c; }
+  .hint { color: #6b8099; font-size: 12px; margin-left: auto; }
+  details { margin-top: 18px; border-left: 2px solid #fbbf24; padding: 12px 16px;
+            background: #121b26; border-radius: 8px; }
+  summary { cursor: pointer; font-weight: 650; }
+  ul { margin: 10px 0 0; padding-left: 18px; color: #b9c7d6; }
+  li { margin: 5px 0; }
+  code { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px;
+         background: #1a2431; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Pendulum sonification</h1>
+  <p class="sub">One swing, one note. The rod&rsquo;s length is chosen from the note; the note is read back out of the motion.</p>
+
+  <div id="stage" aria-describedby="stage-description">
+    <canvas id="scene" role="img"
+      aria-label="Four linked panels: a to-scale pendulum, its angular displacement over one period, a 256 times resampling with a frequency estimate, and the resulting note on a piano roll."></canvas>
+    <div class="bar">
+      <button id="sound" type="button" aria-pressed="false">Sound off &mdash; click to play</button>
+      <span class="hint" id="status">running silently</span>
+    </div>
+  </div>
+
+  <p id="stage-description" class="sub" style="margin-top:12px">
+    An ideal, undamped pendulum. Rod lengths run 8.4&ndash;33.6&nbsp;cm, giving swings of 0.859&ndash;1.719&nbsp;Hz,
+    resampled 256&times; so that a 23.4&nbsp;cm rod sounds as C4. The strip below the panels is the score:
+    sixteen notes, 13.54&nbsp;s, resolving onto its own first note.
+  </p>
+
+  <details>
+    <summary>What this does and does not claim</summary>
+    <ul>
+      <li><strong>Damping is not modelled.</strong> A pendulum that swings forever has no energy source; real ones decay, which is why clock pendulums need an escapement. This is an ideal oscillator, shown for clarity.</li>
+      <li><strong>The audio is a resampling, not a recording.</strong> &times;256 is sample-rate change. What you hear is a sonification of sampled motion.</li>
+      <li><strong>Small-angle approximation.</strong> Amplitude is 0.36&nbsp;rad (about 20.6&deg;). Beyond roughly 0.4&nbsp;rad the true period lengthens and a pure sinusoid stops describing the swing.</li>
+      <li><strong>The apparatus is not built.</strong> Rod lengths are those a physical build would require.</li>
+    </ul>
+  </details>
+</main>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
