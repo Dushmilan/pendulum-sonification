@@ -1,0 +1,12 @@
+{
+  "name": "pendulum-sonification",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "An ideal pendulum, resampled 256 times into the audible range and played back as music.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test",
+    "hero": "node tools/build-hero.mjs"
+  }
+}
