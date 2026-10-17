@@ -1,4 +1,4 @@
-import { AMPLITUDE } from './physics.js';
+import { AMPLITUDE, RESAMPLE } from './physics.js';
 import { JUST_INTONATION } from './score.js';
 
 export const PANEL_COUNT = 4;
@@ -9,9 +9,9 @@ export const ARROW_GAP = 34;
  * stops working and the page scrolls sideways instead of squeezing labels into each other.
  */
 export const MIN_CANVAS_WIDTH = 760;
-export const ROD_MIN_METRES = 0.06;
+/** The top of the ruler's scale, in metres: 35 cm, comfortably past the longest rod. */
 export const ROD_MAX_METRES = 0.35;
-export const HISTORY_DEPTH = 8;
+export const HISTORY_DEPTH = 6;
 
 const TITLES = ['\u2460 PHYSICAL', '\u2461 OSCILLATION \u2192 SIGNAL', '\u2462 COMPUTER', '\u2463 MUSIC OUT'];
 const ARROW_LABELS = ['\u03b8(t)', 'x[n]', 'notes'];
@@ -48,12 +48,28 @@ export function panelRects(width, height) {
   }));
 }
 
+/**
+ * Linear from zero, so the drawn rod really is proportional to the real rod: a 33.6 cm
+ * pendulum draws four times as long as an 8.4 cm one, as the labels claim.
+ */
 export function rodPixels(rodMetres, availableHeight) {
-  if (!Number.isFinite(rodMetres)) throw new RangeError(`rodMetres must be finite, got ${rodMetres}`);
+  if (!Number.isFinite(rodMetres) || rodMetres < 0) {
+    throw new RangeError(`rodMetres must be a non-negative finite number, got ${rodMetres}`);
+  }
   if (!(availableHeight > 0)) throw new RangeError(`availableHeight must be > 0, got ${availableHeight}`);
-  const t = (rodMetres - ROD_MIN_METRES) / (ROD_MAX_METRES - ROD_MIN_METRES);
-  const clamped = Math.min(1, Math.max(0, t));
-  return availableHeight * (0.4 + 0.48 * clamped);
+  return (rodMetres / ROD_MAX_METRES) * availableHeight;
+}
+
+/** Centimetre marks on the same scale the rod is drawn with, measured down from the pivot. */
+export function rulerTicks(availableHeight, maxCm = ROD_MAX_METRES * 100, stepCm = 5) {
+  if (!(availableHeight > 0)) throw new RangeError(`availableHeight must be > 0, got ${availableHeight}`);
+  if (!(maxCm > 0)) throw new RangeError(`maxCm must be > 0, got ${maxCm}`);
+  if (!(stepCm > 0)) throw new RangeError(`stepCm must be > 0, got ${stepCm}`);
+  const ticks = [];
+  for (let cm = 0; cm <= maxCm + 1e-9; cm += stepCm) {
+    ticks.push({ cm, y: (cm / maxCm) * availableHeight });
+  }
+  return ticks;
 }
 
 /** Normalised samples of cos(2*pi*cycles*u) across one period of the current note. */
@@ -79,6 +95,21 @@ export function historyRows(count, top, rowHeight, limit = Infinity) {
   const last = rows.length ? rows[rows.length - 1] : top;
   if (last > limit) throw new RangeError(`history band overflows the space available: ${last} > ${limit}`);
   return rows;
+}
+
+/**
+ * Seconds ago that each note in `history` was sounding, oldest first. History arrives
+ * oldest-first from the ring buffer, so the note that just played is the last entry and
+ * gets an age of zero — the piano roll scrolls away from the now line, not towards it.
+ */
+export function historyAges(history) {
+  const ages = new Array(history.length).fill(0);
+  let age = 0;
+  for (let i = history.length - 1; i >= 0; i--) {
+    ages[i] = age;
+    age += history[i].period;
+  }
+  return ages;
 }
 
 function roundedRect(ctx, x, y, w, h, r) {
@@ -131,27 +162,32 @@ function drawFlowArrow(ctx, from, to, y, text) {
 
 function drawPhysical(ctx, rect, event, phase) {
   const inner = { x: rect.x + 12, y: rect.y + 30, w: rect.w - 24, h: rect.h - 78 };
-  const pivotX = inner.x + inner.w / 2;
+  const pivotX = inner.x + (inner.w - 26) / 2;
   const pivotY = inner.y + 14;
-  const rod = rodPixels(event.rodMetres, inner.h - 20);
+  const scaleHeight = inner.h - 20;
+  const rod = rodPixels(event.rodMetres, scaleHeight);
   const angle = AMPLITUDE * Math.cos(2 * Math.PI * phase);
   const bobX = pivotX + rod * Math.sin(angle);
   const bobY = pivotY + rod * Math.cos(angle);
 
-  // centimetre ruler, so the 8.4-33.6 cm range is honest rather than decorative
+  // centimetre ruler on the rod's own scale, so the 8.4-33.6 cm range is honest
   const rulerX = rect.x + rect.w - 22;
+  const ticks = rulerTicks(scaleHeight, ROD_MAX_METRES * 100, 5);
   ctx.strokeStyle = palette.line;
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(rulerX, inner.y);
-  ctx.lineTo(rulerX, inner.y + inner.h);
+  ctx.moveTo(rulerX, pivotY);
+  ctx.lineTo(rulerX, pivotY + scaleHeight);
   ctx.stroke();
-  for (let cm = 0; cm <= Math.round(inner.h); cm += 10) {
-    const y = inner.y + inner.h - cm;
+  ctx.textAlign = 'left';
+  for (const tick of ticks) {
+    const y = pivotY + tick.y;
+    const major = tick.cm % 10 === 0;
     ctx.beginPath();
     ctx.moveTo(rulerX, y);
-    ctx.lineTo(rulerX + (cm % 20 === 0 ? 7 : 4), y);
+    ctx.lineTo(rulerX + (major ? 7 : 4), y);
     ctx.stroke();
+    if (major && tick.cm > 0) label(ctx, String(tick.cm), rulerX + 9, y + 3, palette.dim, '600 8px ui-monospace, Menlo, monospace');
   }
 
   ctx.strokeStyle = palette.line;
@@ -183,13 +219,14 @@ function drawPhysical(ctx, rect, event, phase) {
 
 function drawSignal(ctx, rect, event, phase, history) {
   const inner = { x: rect.x + 14, y: rect.y + 34, w: rect.w - 28, h: rect.h - 74 };
-  const bandHeight = 66;
+  const bandHeight = 76;
   const bandTop = inner.y + 6;
 
   // The pitch history: each past note kept at its own wavelength, so a change of pitch
   // reads as a change of wavelength rather than as an abstract colour change.
   const past = history.slice(0, HISTORY_DEPTH);
-  const rows = historyRows(past.length, bandTop, bandHeight / HISTORY_DEPTH, bandTop + bandHeight);
+  const rowHeight = (bandHeight - 8) / HISTORY_DEPTH;
+  const rows = historyRows(past.length, bandTop, rowHeight, bandTop + bandHeight - 8);
   past.forEach((note, i) => {
     const cycles = event.period / note.period;
     const y = rows[i] + 4;
@@ -199,7 +236,7 @@ function drawSignal(ctx, rect, event, phase, history) {
     for (let s = 0; s <= 120; s++) {
       const u = s / 120;
       const x = inner.x + u * inner.w;
-      const py = y - 7 * Math.cos(2 * Math.PI * cycles * u);
+      const py = y - 4 * Math.cos(2 * Math.PI * cycles * u);
       if (s === 0) ctx.moveTo(x, py); else ctx.lineTo(x, py);
     }
     ctx.stroke();
@@ -260,12 +297,13 @@ function drawSignal(ctx, rect, event, phase, history) {
 function drawComputer(ctx, rect, event, phase) {
   const inner = { x: rect.x + 14, y: rect.y + 32, w: rect.w - 28, h: rect.h - 78 };
 
-  // Step one: the very same waveform on a 256x faster time base, so it reads as dense.
-  const squeezed = tracePoints(300, 1, 26);
+  // Step one: the same waveform on a 256x faster time base. One swing in 4 ms is one
+  // cycle — drawing it as a dense scribble would misreport the frequency by ~4 octaves.
+  const squeezed = tracePoints(300);
   const sqMid = inner.y + inner.h * 0.2;
   const sqAmp = inner.h * 0.15;
-  ctx.strokeStyle = 'rgba(167,139,250,0.75)';
-  ctx.lineWidth = 1.1;
+  ctx.strokeStyle = 'rgba(167,139,250,0.85)';
+  ctx.lineWidth = 1.4;
   ctx.beginPath();
   squeezed.forEach((p, i) => {
     const x = inner.x + p.u * inner.w;
@@ -309,7 +347,7 @@ function drawComputer(ctx, rect, event, phase) {
 
   ctx.textAlign = 'center';
   label(ctx, `f\u0302 = ${event.fAudio.toFixed(1)} Hz`, rect.x + rect.w / 2, rect.y + rect.h - 40, palette.text, '700 13px ui-monospace, Menlo, monospace');
-  label(ctx, `detected ${event.name}  \u00b7  \u00d7 256`, rect.x + rect.w / 2, rect.y + rect.h - 22, palette.zones.computer, '600 11px ui-monospace, Menlo, monospace');
+  label(ctx, `detected ${event.name}  \u00b7  \u00d7 ${RESAMPLE}`, rect.x + rect.w / 2, rect.y + rect.h - 22, palette.zones.computer, '600 11px ui-monospace, Menlo, monospace');
   ctx.textAlign = 'left';
 }
 
@@ -327,16 +365,18 @@ function drawMusic(ctx, rect, event, phase, history) {
   }
 
   const nowX = inner.x + inner.w - 6;
-  history.slice(0, HISTORY_DEPTH).forEach((past, oldestFirst) => {
-    const age = (oldestFirst + 1) * (past.period + event.period) * 0.6;
+  const past = history.slice(0, HISTORY_DEPTH);
+  const ages = historyAges(past);
+  past.forEach((note, i) => {
+    const age = ages[i];
     if (age > windowSeconds) return;
-    const width = Math.max(3, (past.period / windowSeconds) * inner.w);
-    const right = nowX - (age / windowSeconds) * inner.w;
-    const row = PITCH_ROWS.indexOf(past.name);
+    const row = PITCH_ROWS.indexOf(note.name);
     if (row < 0) return;
-    const alpha = Math.max(0.18, 1 - age / windowSeconds);
-    ctx.fillStyle = `rgba(52,211,153,${alpha.toFixed(3)})`;
-    roundedRect(ctx, Math.max(inner.x, right - width), inner.y + row * rowH + 2, Math.min(width, nowX - Math.max(inner.x, right - width)), rowH - 4, 3);
+    const width = Math.max(3, (note.period / windowSeconds) * inner.w);
+    const right = nowX - (age / windowSeconds) * inner.w;
+    const x = Math.max(inner.x, right - width);
+    ctx.fillStyle = `rgba(52,211,153,${Math.max(0.18, 1 - age / windowSeconds).toFixed(3)})`;
+    roundedRect(ctx, x, inner.y + row * rowH + 2, Math.min(width, nowX - x), rowH - 4, 3);
     ctx.fill();
   });
 
@@ -375,11 +415,11 @@ function drawMusic(ctx, rect, event, phase, history) {
  * proportional to the real note durations, with one playhead crossing the whole width.
  */
 function drawTransport(ctx, state, rects, stripTop, stripHeight) {
-  const { events, loopSeconds, elapsedInLoop } = state;
+  const { events, elapsedInLoop } = state;
   const left = rects[0].x;
   const right = rects[rects.length - 1].x + rects[rects.length - 1].w;
   const width = right - left;
-  const total = events.reduce((sum, e) => sum + e.period, 0) || loopSeconds;
+  const total = events.reduce((sum, e) => sum + e.period, 0) || 1;
   const barTop = stripTop + 4;
   const barHeight = stripHeight - 10;
 
@@ -388,7 +428,7 @@ function drawTransport(ctx, state, rects, stripTop, stripHeight) {
     const segW = (e.period / total) * width;
     ctx.fillStyle = i % 2 ? '#141f2b' : '#101923';
     ctx.fillRect(cursor, barTop, Math.max(1, segW - 1), barHeight);
-    if (segW > 16) {
+    if (segW > 18) {
       ctx.textAlign = 'left';
       label(ctx, e.name, cursor + 3, barTop + barHeight - 3, palette.dim, '600 8px ui-monospace, Menlo, monospace');
     }

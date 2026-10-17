@@ -5,6 +5,7 @@ export const FLOOR_GAIN = 0.0008;
 export const DECAY_EXPONENT = 2.2;
 export const HARMONIC_GAIN = 0.2;
 export const RELEASE_TAIL_SECONDS = 0.05;
+export const CLIP_CURVE_SAMPLES = 2048;
 
 /** Gain of a plucked, music-box-like note at `t` seconds into a note of `duration`. */
 export function envelopeAt(t, duration, options = {}) {
@@ -15,6 +16,19 @@ export function envelopeAt(t, duration, options = {}) {
   if (duration <= attack) return floor;
   const u = (t - attack) / (duration - attack);
   return Math.max(floor, peak * Math.pow(1 - u, DECAY_EXPONENT));
+}
+
+/** Odd, saturating transfer curve: loud sums compress instead of clipping the device. */
+export function clipCurve(samples = CLIP_CURVE_SAMPLES) {
+  if (!Number.isInteger(samples) || samples < 1024) {
+    throw new RangeError(`curve needs at least 1024 samples, got ${samples}`);
+  }
+  const curve = new Float32Array(samples);
+  for (let i = 0; i < samples; i++) {
+    const x = (i / (samples - 1)) * 2 - 1;
+    curve[i] = Math.tanh(1.6 * x) / Math.tanh(1.6);
+  }
+  return curve;
 }
 
 function defaultCtxFactory() {
@@ -30,6 +44,7 @@ function defaultCtxFactory() {
 export function createAudioEngine({ ctxFactory = defaultCtxFactory } = {}) {
   let ctx = null;
   let master = null;
+  let guard = null;
   let muted = true;
 
   function unlock() {
@@ -38,14 +53,27 @@ export function createAudioEngine({ ctxFactory = defaultCtxFactory } = {}) {
         ctx = ctxFactory();
         master = ctx.createGain();
         master.gain.value = MASTER_GAIN;
-        master.connect(ctx.destination);
+        if (typeof ctx.createWaveShaper === 'function') {
+          guard = ctx.createWaveShaper();
+          guard.curve = clipCurve();
+          guard.oversample = '2x';
+          master.connect(guard);
+          guard.connect(ctx.destination);
+        } else {
+          master.connect(ctx.destination);
+        }
       }
-      if (ctx.state === 'suspended' && typeof ctx.resume === 'function') ctx.resume();
+      if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
+        Promise.resolve(ctx.resume()).catch(() => {});
+      }
       muted = false;
       return ctx;
     } catch {
+      // Blocked or unsupported: release anything half-built and keep animating in silence.
+      try { if (ctx && typeof ctx.close === 'function') ctx.close(); } catch { /* ignore */ }
       ctx = null;
       master = null;
+      guard = null;
       muted = true;
       return null;
     }
@@ -57,9 +85,9 @@ export function createAudioEngine({ ctxFactory = defaultCtxFactory } = {}) {
 
     const voice = ctx.createGain();
     voice.connect(master);
-    voice.gain.setValueAtTime(FLOOR_GAIN, startTime);
-    voice.gain.linearRampToValueAtTime(PEAK_GAIN, startTime + ATTACK_SECONDS);
-    voice.gain.exponentialRampToValueAtTime(FLOOR_GAIN, stopAt);
+    voice.gain.setValueAtTime(envelopeAt(0, duration), startTime);
+    voice.gain.linearRampToValueAtTime(envelopeAt(ATTACK_SECONDS, duration), startTime + ATTACK_SECONDS);
+    voice.gain.exponentialRampToValueAtTime(envelopeAt(duration, duration), stopAt);
 
     const fundamental = ctx.createOscillator();
     fundamental.type = 'sine';
@@ -92,6 +120,7 @@ export function createAudioEngine({ ctxFactory = defaultCtxFactory } = {}) {
       try { if (ctx && typeof ctx.close === 'function') ctx.close(); } catch { /* ignore */ }
       ctx = null;
       master = null;
+      guard = null;
       muted = true;
     },
   };

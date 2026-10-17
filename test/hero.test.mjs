@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildHeroSvg, heroThemes, HERO_WIDTH, HERO_HEIGHT, CYCLE_SECONDS } from '../tools/build-hero.mjs';
+import { buildHeroSvg, heroThemes, swingKeyframes, HERO_WIDTH, HERO_HEIGHT, CYCLE_SECONDS } from '../tools/build-hero.mjs';
 import { loopDuration, buildScore, LINE } from '../src/score.js';
+import { AMPLITUDE } from '../src/physics.js';
 
 test('the hero is a standalone svg document', () => {
   const svg = buildHeroSvg({ theme: 'dark' });
@@ -33,6 +34,28 @@ test('it names every note in the line and states the resample', () => {
 
 test('the loop matches the score, so the hero cannot disagree with the page', () => {
   assert.ok(Math.abs(CYCLE_SECONDS - loopDuration(buildScore())) < 1e-9);
+});
+
+test('the hero swings once per note on the real timings, not once per loop', () => {
+  const events = buildScore();
+  const stops = swingKeyframes(events);
+  assert.equal(stops.length, events.length * 2 + 1);
+  assert.equal(stops[0].percent, 0);
+  assert.ok(Math.abs(stops.at(-1).percent - 100) < 1e-9);
+  assert.equal(stops[0].angle, stops.at(-1).angle, 'the loop seam must match');
+  const amplitudeDegrees = (AMPLITUDE * 180) / Math.PI;
+  stops.forEach((stop, i) => {
+    const sign = i % 2 === 0 ? 1 : -1;
+    assert.ok(Math.abs(stop.angle - sign * amplitudeDegrees) < 1e-6, `stop ${i} angle ${stop.angle}`);
+  });
+  const span = (note) => stops[note * 2 + 1].percent - stops[note * 2].percent;
+  assert.ok(span(5) < span(0), 'the fastest note must cover less loop time than the slowest');
+});
+
+test('the swing keyframes come from the physics constants, not literals', () => {
+  const svg = buildHeroSvg({ theme: 'dark' });
+  assert.match(svg, /rotate\(-20\.6\d*deg\)/);
+  assert.ok(!svg.includes('rotate(-20.6deg)'), 'the hardcoded literal must be gone');
 });
 
 test('the two themes differ only in palette', () => {

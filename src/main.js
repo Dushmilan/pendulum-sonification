@@ -21,6 +21,7 @@ let scheduler = null;
 let lastTick = -Infinity;
 let anchorTime = 0;
 let anchorPosition = 0;
+let lastNoteIndex = -1;
 
 /** The active clock: the audio clock once sound exists, the page clock before that. */
 function nowSeconds() {
@@ -43,9 +44,22 @@ function makeScheduler() {
     events: score,
     onNote: ({ event, startTime, duration }) => {
       engine.playNote(event.fAudio, startTime, duration);
-      history.push({ name: event.name, period: event.period });
     },
   });
+}
+
+/**
+ * The pitch history comes from what is sounding now, not from what has been *queued* —
+ * the scheduler runs up to a second and a half ahead, and a piano roll that shows notes
+ * before they play would be lying.
+ */
+function noteAtPosition(position) {
+  const at = eventAt(score, position);
+  if (at.index !== lastNoteIndex) {
+    lastNoteIndex = at.index;
+    history.push({ name: at.event.name, period: at.event.period });
+  }
+  return at;
 }
 
 function resize() {
@@ -62,7 +76,7 @@ function resize() {
 
 function draw(now) {
   const position = loopPosition(now);
-  const { event, phase } = eventAt(score, position);
+  const { event, phase } = noteAtPosition(position);
   drawScene(ctx, {
     event,
     phase,
@@ -74,7 +88,9 @@ function draw(now) {
   }, layout);
 }
 
-function tick(now) {
+/** Pumped from a timer, not from the frame loop, so a hidden tab or a still picture keeps time. */
+function pump() {
+  const now = nowSeconds();
   if (!scheduler) return;
   if (now - lastTick < TICK_SECONDS) return;
   lastTick = now;
@@ -87,15 +103,8 @@ function tick(now) {
 
 function frame() {
   const now = nowSeconds();
-  tick(now);
   draw(now);
   if (!reducedMotion.matches) requestAnimationFrame(frame);
-}
-
-function renderStaticFrame() {
-  const now = nowSeconds();
-  tick(now);
-  draw(now);
 }
 
 soundButton.addEventListener('click', () => {
@@ -122,6 +131,7 @@ soundButton.addEventListener('click', () => {
   soundButton.textContent = 'Sound on';
   status.textContent = 'playing';
   document.removeEventListener('keydown', onKey);
+  if (reducedMotion.matches) draw(nowSeconds());
 });
 
 function onKey(event) {
@@ -131,10 +141,18 @@ function onKey(event) {
   }
 }
 
+/** Repaints the still picture when the animation loop is not running (resize, media change). */
+function redrawIfStatic() {
+  if (reducedMotion.matches) draw(nowSeconds());
+}
+
 document.addEventListener('keydown', onKey);
-window.addEventListener('resize', resize);
+window.addEventListener('resize', () => {
+  resize();
+  redrawIfStatic();
+});
 reducedMotion.addEventListener('change', () => {
-  if (reducedMotion.matches) renderStaticFrame();
+  if (reducedMotion.matches) redrawIfStatic();
   else requestAnimationFrame(frame);
 });
 
@@ -142,6 +160,7 @@ resize();
 anchorAt(nowSeconds(), 0);
 scheduler = makeScheduler();
 scheduler.start(nowSeconds(), 0);
+setInterval(pump, TICK_SECONDS * 1000);
 
 window.__pendulum = {
   engine,
@@ -156,5 +175,5 @@ window.__pendulum = {
   },
 };
 
-if (reducedMotion.matches) renderStaticFrame();
-else requestAnimationFrame(frame);
+draw(nowSeconds());
+if (!reducedMotion.matches) requestAnimationFrame(frame);

@@ -39,3 +39,10 @@ test('a wide diagram stays readable on a narrow screen by scrolling rather than 
   assert.match(html, /#stage\s*\{[^}]*overflow-x:\s*auto/);
   assert.match(html, /id="stage"[^>]*tabindex="0"/);
 });
+
+test('resizing repaints a still picture instead of leaving it blank', async () => {
+  const main = await readFile(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.match(main, /function redrawIfStatic\(\)/);
+  assert.match(main, /addEventListener\('resize',[\s\S]{0,160}redrawIfStatic\(\)/);
+  assert.match(main, /redrawIfStatic[\s\S]{0,160}draw\(nowSeconds\(\)\)/);
+});

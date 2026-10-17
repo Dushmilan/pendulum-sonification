@@ -1,8 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300" role="img" aria-label="A pendulum swinging, resampled into music. Rods from 8.4 cm to 33.6 cm, swings 1.719 to 0.859 Hz, resampled 256 times to become audible.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300" role="img" aria-label="A pendulum swinging once per note, resampled into music. Rods from 8.4 cm to 33.6 cm, swings 1.719 to 0.859 Hz, resampled 256 times to become audible.">
   <style>
-    .swing { animation: swing 13.5434s ease-in-out infinite; transform-origin: 0 0; }
+    .swing { animation: swing 13.5434s linear infinite; transform-origin: 0 0; }
     .scroll { animation: scroll 6s linear infinite; }
-    @keyframes swing { 0% { transform: rotate(-20.6deg); } 50% { transform: rotate(20.6deg); } 100% { transform: rotate(-20.6deg); } }
+    @keyframes swing {
+    0.0000% { transform: rotate(20.6265deg); }
+    4.2959% { transform: rotate(-20.6265deg); }
+    8.5919% { transform: rotate(20.6265deg); }
+    12.1718% { transform: rotate(-20.6265deg); }
+    15.7518% { transform: rotate(20.6265deg); }
+    18.9737% { transform: rotate(-20.6265deg); }
+    22.1957% { transform: rotate(20.6265deg); }
+    25.0597% { transform: rotate(-20.6265deg); }
+    27.9236% { transform: rotate(20.6265deg); }
+    30.3103% { transform: rotate(-20.6265deg); }
+    32.6969% { transform: rotate(20.6265deg); }
+    34.8449% { transform: rotate(-20.6265deg); }
+    36.9928% { transform: rotate(20.6265deg); }
+    39.3795% { transform: rotate(-20.6265deg); }
+    41.7661% { transform: rotate(20.6265deg); }
+    44.6301% { transform: rotate(-20.6265deg); }
+    47.4940% { transform: rotate(20.6265deg); }
+    50.7160% { transform: rotate(-20.6265deg); }
+    53.9379% { transform: rotate(20.6265deg); }
+    56.8019% { transform: rotate(-20.6265deg); }
+    59.6659% { transform: rotate(20.6265deg); }
+    62.0525% { transform: rotate(-20.6265deg); }
+    64.4391% { transform: rotate(20.6265deg); }
+    67.3031% { transform: rotate(-20.6265deg); }
+    70.1671% { transform: rotate(20.6265deg); }
+    73.3890% { transform: rotate(-20.6265deg); }
+    76.6110% { transform: rotate(20.6265deg); }
+    80.1909% { transform: rotate(-20.6265deg); }
+    83.7709% { transform: rotate(20.6265deg); }
+    87.5895% { transform: rotate(-20.6265deg); }
+    91.4081% { transform: rotate(20.6265deg); }
+    95.7041% { transform: rotate(-20.6265deg); }
+    100.0000% { transform: rotate(20.6265deg); }
+    }
     @keyframes scroll { from { transform: translateX(0px); } to { transform: translateX(-241.00px); } }
     @media (prefers-reduced-motion: reduce) { .swing, .scroll { animation: none; } }
   </style>

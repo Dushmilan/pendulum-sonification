@@ -75,8 +75,11 @@ Then open `index.html` — or serve the directory, since ES modules need HTTP ra
     tools/build-hero.mjs   generates assets/ from src/physics.js
 
 Once sound is on, note timing is driven by `AudioContext.currentTime` through a
-lookahead scheduler rather than by `requestAnimationFrame`, so a tab left open for hours
-does not drift, and a backgrounded tab catches up in order instead of dropping notes.
+lookahead scheduler pumped by a timer rather than by `requestAnimationFrame`, so a tab
+left open for hours does not drift, and a still picture under `prefers-reduced-motion`
+still keeps time. Browsers throttle hidden-tab timers to about once a second, which the
+1.5 s lookahead covers; if a tab is hidden long enough to outlast that, the line resumes
+at the present instead of firing the missed notes as a burst.
 
 `src/physics.js` is imported by both the page and the hero generator, so the SVG cannot
 drift from the demo.

@@ -36,10 +36,14 @@ test('theta peaks at t=0, troughs at half a period, and returns at a full period
   close(theta(T, f), AMPLITUDE, 1e-12);
 });
 
-test('the resample maps a 24 cm pendulum into the audible range', () => {
+test('the resample puts every rod in the score into the audible range', () => {
   const fPend = pendulumFrequency(0.24);
   close(audioFrequency(fPend), fPend * 256, 1e-9);
   close(pendulumFrequencyForAudio(audioFrequency(fPend)), fPend, 1e-12);
+  for (const rod of [0.084, 0.15, 0.234, 0.336]) {
+    const audible = audioFrequency(pendulumFrequency(rod));
+    assert.ok(audible >= 20 && audible <= 20000, `${rod} m sounds at ${audible.toFixed(1)} Hz, outside hearing`);
+  }
 });
 
 test('A3 (220 Hz) needs a 33.6 cm rod and a 1.164 s swing', () => {

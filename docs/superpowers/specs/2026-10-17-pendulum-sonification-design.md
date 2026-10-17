@@ -102,16 +102,20 @@ one-minute change and requires no other edit.
 
 ## 7. Composition
 
-One dark stage. Four zones laid out left to right, connected by a continuous flow line,
-with **a single vertical "now" line crossing all four zones** so the composition reads
-as one instrument rather than four widgets.
+One dark stage. Four zones laid out left to right, joined by a flow line, and beneath
+them **a transport strip on a single shared time base** — the 16 notes drawn in
+proportion to their real durations, with one amber playhead crossing the whole width.
+Each zone also carries its own local playhead, because each zone has its own time axis
+(one period in ②, a ten-second window in ④); the transport strip is what makes the four
+read as one instrument rather than four widgets.
 
 All four zones advance in lockstep: one swing = one note = one FFT frame = one
 piano-roll bar.
 
-- **① Physical** — the rod drawn to true scale against a centimetre ruler, so the
-  8.4–33.6 cm range is honest rather than decorative. Labels `L = 23.4 cm`,
-  `f = 1.031 Hz`. Amplitude drawn at θ₀.
+- **① Physical** — the rod drawn linearly from zero against a labelled centimetre ruler,
+  so the lengths are proportional rather than decorative: a 33.6 cm pendulum really does
+  draw four times as long as an 8.4 cm one. Labels `L = 23.4 cm`, `f = 1.031 Hz`.
+  Amplitude drawn at θ₀.
 - **② Oscillation → signal** — θ(t) for the current note drawn across exactly one
   period, with a sweeping playhead. The previous eight notes remain as faint traces at
   their own periods, so a change of pitch is visible as a change of wavelength.
@@ -165,8 +169,12 @@ engineering problem.
 - **Before unlock** the page is silent, and `performance.now()` drives visuals. On
   unlock the timeline is re-anchored once, so the first click does not make the
   animation jump.
-- **Backgrounded tab.** rAF stops; audio continues on the audio clock. On return the
-  visuals resync from the audio clock. This is intended behaviour, not an accident.
+- **Backgrounded tab.** Browsers clamp hidden-tab timers to roughly one wake-up a
+  second, so the scheduler is pumped by a timer with a 1.5 s lookahead rather than by
+  rAF, which buys continuous audio across that clamp. If a tab is hidden longer than the
+  lookahead covers, the missed notes are **dropped and the line resumes at the present** —
+  never fired at once with start times in the past. Note boundaries are sums of the real
+  note periods, so nothing accumulates.
 - **Memory.** 6,379 loops a day means the pitch-history, piano-roll, and spectrum
   histories must be fixed-size ring buffers, never growing arrays.
 

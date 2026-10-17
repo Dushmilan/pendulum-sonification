@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { PANEL_COUNT, panelRects, rodPixels, tracePoints, drawScene, palette, historyRows, MIN_CANVAS_WIDTH } from '../src/render.js';
+import { PANEL_COUNT, panelRects, rodPixels, tracePoints, drawScene, palette, historyRows, historyAges, rulerTicks, MIN_CANVAS_WIDTH, ROD_MAX_METRES } from '../src/render.js';
 
 test('four panels tile the width without overlapping or escaping the canvas', () => {
   const rects = panelRects(1200, 500);
@@ -25,15 +25,42 @@ test('nonsensical canvas sizes throw rather than producing NaN geometry', () => 
   assert.throws(() => panelRects(100, 100), RangeError);
 });
 
-test('rodPixels clamps to the drawable band and never returns NaN', () => {
+test('rodPixels is proportional to the real rod length, not merely monotonic', () => {
   const h = 300;
-  assert.ok(rodPixels(0.334, h) > rodPixels(0.084, h));
-  const smallest = rodPixels(0.000001, h);
-  const largest = rodPixels(999, h);
-  assert.ok(smallest > 0 && Number.isFinite(smallest));
-  assert.ok(largest <= h && Number.isFinite(largest));
+  const small = rodPixels(0.084, h);
+  const big = rodPixels(0.336, h);
+  assert.ok(Math.abs(big / small - 4) < 1e-9, `a 4x longer rod must draw 4x longer, got ${big / small}`);
+  assert.ok(Math.abs(rodPixels(ROD_MAX_METRES, h) - h) < 1e-9, 'the axis maximum fills the band');
+  assert.ok(Math.abs(rodPixels(ROD_MAX_METRES / 2, h) - h / 2) < 1e-9, 'half the length is half the band');
+  assert.ok(Math.abs(rodPixels(0, h)) < 1e-9, 'zero length is zero pixels');
   assert.throws(() => rodPixels(NaN, h), RangeError);
+  assert.throws(() => rodPixels(-0.1, h), RangeError);
   assert.throws(() => rodPixels(0.2, 0), RangeError);
+});
+
+test('rulerTicks marks true centimetres on the same scale as the rod', () => {
+  const h = 300;
+  const ticks = rulerTicks(h, 35, 5);
+  assert.equal(ticks.length, 8);
+  assert.equal(ticks[0].cm, 0);
+  assert.equal(ticks.at(-1).cm, 35);
+  for (let i = 1; i < ticks.length; i++) assert.ok(ticks[i].y > ticks[i - 1].y);
+  assert.ok(Math.abs(ticks.at(-1).y - h) < 1e-9, 'the 35 cm mark is the bottom of the band');
+  assert.ok(Math.abs(rodPixels(0.336, h) - rulerTicks(h, 35, 5).find((t) => t.cm === 35).y * (0.336 / 0.35)) < 1e-6);
+  assert.throws(() => rulerTicks(0), RangeError);
+  assert.throws(() => rulerTicks(h, 0, 5), RangeError);
+  assert.throws(() => rulerTicks(h, 35, 0), RangeError);
+});
+
+test('historyAges offsets each past note by its own swing, with the newest at zero', () => {
+  const past = [
+    { name: 'A3', period: 1.0 },
+    { name: 'C4', period: 0.5 },
+    { name: 'E4', period: 0.25 },
+  ];
+  assert.deepEqual(historyAges(past), [0.75, 0.25, 0]);
+  assert.deepEqual(historyAges([]), []);
+  assert.deepEqual(historyAges([{ name: 'A3', period: 2 }]), [0]);
 });
 
 test('tracePoints returns a closed period within the amplitude band', () => {
