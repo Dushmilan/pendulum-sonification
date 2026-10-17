@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300" role="img" aria-label="A pendulum swinging, resampled into music. Rods from 8.4 cm to 33.6 cm, swings 1.719 to 0.859 Hz, resampled 256 times to become audible.">
+  <style>
+    .swing { animation: swing 13.5434s ease-in-out infinite; transform-origin: 0 0; }
+    .scroll { animation: scroll 6s linear infinite; }
+    @keyframes swing { 0% { transform: rotate(-20.6deg); } 50% { transform: rotate(20.6deg); } 100% { transform: rotate(-20.6deg); } }
+    @keyframes scroll { from { transform: translateX(0px); } to { transform: translateX(-241.00px); } }
+    @media (prefers-reduced-motion: reduce) { .swing, .scroll { animation: none; } }
+  </style>
+  <rect width="1200" height="300" fill="#0f1620"/>
+  <rect x="24" y="24" width="261.0" height="252" rx="10" fill="#0b121a" stroke="#1e2b38"/><text x="36.0" y="42" fill="#6b8099" font-family="ui-sans-serif, system-ui" font-size="10" font-weight="700">① PHYSICAL</text>
+  <rect x="321" y="24" width="261.0" height="252" rx="10" fill="#0b121a" stroke="#1e2b38"/><text x="333.0" y="42" fill="#6b8099" font-family="ui-sans-serif, system-ui" font-size="10" font-weight="700">② OSCILLATION → SIGNAL</text>
+  <rect x="618" y="24" width="261.0" height="252" rx="10" fill="#0b121a" stroke="#1e2b38"/><text x="630.0" y="42" fill="#6b8099" font-family="ui-sans-serif, system-ui" font-size="10" font-weight="700">③ COMPUTER</text>
+  <rect x="915" y="24" width="261.0" height="252" rx="10" fill="#0b121a" stroke="#1e2b38"/><text x="927.0" y="42" fill="#6b8099" font-family="ui-sans-serif, system-ui" font-size="10" font-weight="700">④ MUSIC OUT</text>
+  <g transform="translate(154.5, 58)">
+    <g class="swing">
+      <line x1="0" y1="0" x2="0" y2="120" stroke="#6b8099" stroke-width="2"/>
+      <circle cx="0" cy="120" r="9" fill="#38bdf8"/>
+    </g>
+  </g>
+  <text x="40.0" y="82" fill="#dbe4ee" font-family="ui-monospace, Menlo, monospace" font-size="12">33.6 cm → 0.859 Hz</text>
+  <text x="40.0" y="100" fill="#6b8099" font-family="ui-monospace, Menlo, monospace" font-size="11">8.4 cm → 1.719 Hz</text>
+  <g transform="translate(321.0, 120)">
+    <g class="scroll">
+      <path d="M0.00 -12.00 L2.01 -11.80 L4.02 -11.20 L6.03 -10.23 L8.03 -8.92 L10.04 -7.31 L12.05 -5.45 L14.06 -3.41 L16.07 -1.25 L18.07 0.94 L20.08 3.11 L22.09 5.17 L24.10 7.05 L26.11 8.70 L28.12 10.06 L30.13 11.09 L32.13 11.74 L34.14 12.00 L36.15 11.85 L38.16 11.31 L40.17 10.39 L42.17 9.12 L44.18 7.55 L46.19 5.73 L48.20 3.71 L50.21 1.57 L52.22 -0.63 L54.23 -2.80 L56.23 -4.88 L58.24 -6.80 L60.25 -8.49 L62.26 -9.89 L64.27 -10.96 L66.28 -11.67 L68.28 -11.98 L70.29 -11.90 L72.30 -11.41 L74.31 -10.55 L76.32 -9.33 L78.33 -7.79 L80.33 -6.00 L82.34 -4.01 L84.35 -1.88 L86.36 0.31 L88.37 2.49 L90.38 4.59 L92.38 6.54 L94.39 8.26 L96.40 9.71 L98.41 10.83 L100.42 11.59 L102.42 11.96 L104.43 11.93 L106.44 11.51 L108.45 10.69 L110.46 9.52 L112.47 8.03 L114.47 6.27 L116.48 4.30 L118.49 2.19 L120.50 0.00 L122.51 -2.19 L124.52 -4.30 L126.53 -6.27 L128.53 -8.03 L130.54 -9.52 L132.55 -10.69 L134.56 -11.51 L136.57 -11.93 L138.57 -11.96 L140.58 -11.59 L142.59 -10.83 L144.60 -9.71 L146.61 -8.26 L148.62 -6.54 L150.63 -4.59 L152.63 -2.49 L154.64 -0.31 L156.65 1.88 L158.66 4.01 L160.67 6.00 L162.68 7.79 L164.68 9.33 L166.69 10.55 L168.70 11.41 L170.71 11.90 L172.72 11.98 L174.72 11.67 L176.73 10.96 L178.74 9.89 L180.75 8.49 L182.76 6.80 L184.77 4.88 L186.78 2.80 L188.78 0.63 L190.79 -1.57 L192.80 -3.71 L194.81 -5.73 L196.82 -7.55 L198.82 -9.12 L200.83 -10.39 L202.84 -11.31 L204.85 -11.85 L206.86 -12.00 L208.87 -11.74 L210.88 -11.09 L212.88 -10.06 L214.89 -8.70 L216.90 -7.05 L218.91 -5.17 L220.92 -3.11 L222.93 -0.94 L224.93 1.25 L226.94 3.41 L228.95 5.45 L230.96 7.31 L232.97 8.92 L234.97 10.23 L236.98 11.20 L238.99 11.80 L241.00 12.00" fill="none" stroke="#38bdf8" stroke-width="2"/>
+      <path d="M0.00 -12.00 L2.01 -11.80 L4.02 -11.20 L6.03 -10.23 L8.03 -8.92 L10.04 -7.31 L12.05 -5.45 L14.06 -3.41 L16.07 -1.25 L18.07 0.94 L20.08 3.11 L22.09 5.17 L24.10 7.05 L26.11 8.70 L28.12 10.06 L30.13 11.09 L32.13 11.74 L34.14 12.00 L36.15 11.85 L38.16 11.31 L40.17 10.39 L42.17 9.12 L44.18 7.55 L46.19 5.73 L48.20 3.71 L50.21 1.57 L52.22 -0.63 L54.23 -2.80 L56.23 -4.88 L58.24 -6.80 L60.25 -8.49 L62.26 -9.89 L64.27 -10.96 L66.28 -11.67 L68.28 -11.98 L70.29 -11.90 L72.30 -11.41 L74.31 -10.55 L76.32 -9.33 L78.33 -7.79 L80.33 -6.00 L82.34 -4.01 L84.35 -1.88 L86.36 0.31 L88.37 2.49 L90.38 4.59 L92.38 6.54 L94.39 8.26 L96.40 9.71 L98.41 10.83 L100.42 11.59 L102.42 11.96 L104.43 11.93 L106.44 11.51 L108.45 10.69 L110.46 9.52 L112.47 8.03 L114.47 6.27 L116.48 4.30 L118.49 2.19 L120.50 0.00 L122.51 -2.19 L124.52 -4.30 L126.53 -6.27 L128.53 -8.03 L130.54 -9.52 L132.55 -10.69 L134.56 -11.51 L136.57 -11.93 L138.57 -11.96 L140.58 -11.59 L142.59 -10.83 L144.60 -9.71 L146.61 -8.26 L148.62 -6.54 L150.63 -4.59 L152.63 -2.49 L154.64 -0.31 L156.65 1.88 L158.66 4.01 L160.67 6.00 L162.68 7.79 L164.68 9.33 L166.69 10.55 L168.70 11.41 L170.71 11.90 L172.72 11.98 L174.72 11.67 L176.73 10.96 L178.74 9.89 L180.75 8.49 L182.76 6.80 L184.77 4.88 L186.78 2.80 L188.78 0.63 L190.79 -1.57 L192.80 -3.71 L194.81 -5.73 L196.82 -7.55 L198.82 -9.12 L200.83 -10.39 L202.84 -11.31 L204.85 -11.85 L206.86 -12.00 L208.87 -11.74 L210.88 -11.09 L212.88 -10.06 L214.89 -8.70 L216.90 -7.05 L218.91 -5.17 L220.92 -3.11 L222.93 -0.94 L224.93 1.25 L226.94 3.41 L228.95 5.45 L230.96 7.31 L232.97 8.92 L234.97 10.23 L236.98 11.20 L238.99 11.80 L241.00 12.00" fill="none" stroke="#38bdf8" stroke-width="2" transform="translate(241.00, 0)"/>
+    </g>
+  </g>
+  <text x="321.0" y="262" fill="#dbe4ee" font-family="ui-monospace, Menlo, monospace" font-size="12">× 256 → audible</text>
+  <text x="634.0" y="262" fill="#dbe4ee" font-family="ui-monospace, Menlo, monospace" font-size="12">C4 = 23.4 cm → 1.031 Hz → 264 Hz</text>
+  <rect x="634.0" y="172.0" width="29.3" height="70" rx="2" fill="#38bdf8" opacity="0.85"/>
+  <rect x="669.3" y="180.0" width="29.3" height="62" rx="2" fill="#38bdf8" opacity="0.75"/>
+  <rect x="704.6" y="188.0" width="29.3" height="54" rx="2" fill="#38bdf8" opacity="0.65"/>
+  <rect x="739.9" y="196.0" width="29.3" height="46" rx="2" fill="#38bdf8" opacity="0.55"/>
+  <rect x="775.1" y="204.0" width="29.3" height="38" rx="2" fill="#38bdf8" opacity="0.45"/>
+  <rect x="810.4" y="212.0" width="29.3" height="30" rx="2" fill="#38bdf8" opacity="0.35"/>
+  <rect x="845.7" y="220.0" width="29.3" height="22" rx="2" fill="#38bdf8" opacity="0.25"/>
+  <text x="935.0" y="82.0" fill="#dbe4ee" font-family="ui-monospace, Menlo, monospace" font-size="11">A3</text>
+  <text x="935.0" y="96.0" fill="#dbe4ee" font-family="ui-monospace, Menlo, monospace" font-size="11">C4</text>
+  <text x="935.0" y="110.0" fill="#dbe4ee" font-family="ui-monospace, Menlo, monospace" font-size="11">D4</text>
+  <text x="935.0" y="124.0" fill="#dbe4ee" font-family="ui-monospace, Menlo, monospace" font-size="11">E4</text>
+  <text x="935.0" y="138.0" fill="#dbe4ee" font-family="ui-monospace, Menlo, monospace" font-size="11">G4</text>
+  <text x="935.0" y="152.0" fill="#dbe4ee" font-family="ui-monospace, Menlo, monospace" font-size="11">A4</text>
+  <text x="935.0" y="166.0" fill="#dbe4ee" font-family="ui-monospace, Menlo, monospace" font-size="11">B3</text>
+  <rect x="931.0" y="54.0" width="132.6" height="24.4" rx="2" fill="#34d399" opacity="0.35"/><text x="931.0" y="76.4" fill="#6b8099" font-family="ui-monospace, Menlo, monospace" font-size="9">A3 — 33.6 cm</text>
+  <rect x="931.0" y="81.4" width="132.6" height="24.4" rx="2" fill="#34d399" opacity="0.35"/><text x="931.0" y="103.9" fill="#6b8099" font-family="ui-monospace, Menlo, monospace" font-size="9">C4 — 23.4 cm</text>
+  <rect x="931.0" y="108.9" width="132.6" height="24.4" rx="2" fill="#34d399" opacity="0.35"/><text x="931.0" y="131.3" fill="#6b8099" font-family="ui-monospace, Menlo, monospace" font-size="9">D4 — 18.9 cm</text>
+  <rect x="931.0" y="136.3" width="132.6" height="24.4" rx="2" fill="#34d399" opacity="0.35"/><text x="931.0" y="158.7" fill="#6b8099" font-family="ui-monospace, Menlo, monospace" font-size="9">E4 — 15.0 cm</text>
+  <rect x="931.0" y="163.7" width="132.6" height="24.4" rx="2" fill="#34d399" opacity="0.35"/><text x="931.0" y="186.1" fill="#6b8099" font-family="ui-monospace, Menlo, monospace" font-size="9">G4 — 10.4 cm</text>
+  <rect x="931.0" y="191.1" width="132.6" height="24.4" rx="2" fill="#34d399" opacity="0.35"/><text x="931.0" y="213.6" fill="#6b8099" font-family="ui-monospace, Menlo, monospace" font-size="9">A4 — 8.4 cm</text>
+  <rect x="931.0" y="218.6" width="132.6" height="24.4" rx="2" fill="#34d399" opacity="0.35"/><text x="931.0" y="241.0" fill="#6b8099" font-family="ui-monospace, Menlo, monospace" font-size="9">B3 — 26.6 cm</text>
+</svg>
