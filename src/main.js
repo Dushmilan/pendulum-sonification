@@ -2,7 +2,7 @@ import { Ring } from './ring.js';
 import { buildScore, eventAt, loopDuration } from './score.js';
 import { createScheduler, TICK_SECONDS } from './scheduler.js';
 import { createAudioEngine } from './audio.js';
-import { drawScene } from './render.js';
+import { drawScene, MIN_CANVAS_WIDTH } from './render.js';
 
 const canvas = document.getElementById('scene');
 const ctx = canvas.getContext('2d');
@@ -49,11 +49,12 @@ function makeScheduler() {
 }
 
 function resize() {
-  const width = Math.max(320, stage.clientWidth);
+  const width = Math.max(MIN_CANVAS_WIDTH, stage.clientWidth);
   const height = Math.max(360, Math.min(470, width * 0.43));
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   canvas.width = Math.round(width * dpr);
   canvas.height = Math.round(height * dpr);
+  canvas.style.width = `${width}px`;
   canvas.style.height = `${height}px`;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   layout = { width, height };

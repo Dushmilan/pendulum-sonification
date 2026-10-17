@@ -4,6 +4,11 @@ import { JUST_INTONATION } from './score.js';
 export const PANEL_COUNT = 4;
 export const PADDING = 14;
 export const ARROW_GAP = 34;
+/**
+ * The four zones are a single machine read left to right, so below this width the layout
+ * stops working and the page scrolls sideways instead of squeezing labels into each other.
+ */
+export const MIN_CANVAS_WIDTH = 760;
 export const ROD_MIN_METRES = 0.06;
 export const ROD_MAX_METRES = 0.35;
 export const HISTORY_DEPTH = 8;
@@ -51,13 +56,29 @@ export function rodPixels(rodMetres, availableHeight) {
   return availableHeight * (0.4 + 0.48 * clamped);
 }
 
-/** Normalised samples of cos(2*pi*u) across exactly one period: a closed curve. */
-export function tracePoints(samples, amplitudeRatio = 1) {
+/** Normalised samples of cos(2*pi*cycles*u) across one period of the current note. */
+export function tracePoints(samples, amplitudeRatio = 1, cycles = 1) {
   if (!(samples > 1)) throw new RangeError(`samples must be > 1, got ${samples}`);
+  if (!(cycles > 0)) throw new RangeError(`cycles must be > 0, got ${cycles}`);
   return Array.from({ length: samples }, (_, i) => {
     const u = i / (samples - 1);
-    return { u, value: amplitudeRatio * Math.cos(2 * Math.PI * u) };
+    return { u, value: amplitudeRatio * Math.cos(2 * Math.PI * cycles * u) };
   });
+}
+
+/**
+ * Vertical positions for the stacked pitch history. `limit` is the y the band may not
+ * pass, so a wider history cannot bleed into the live waveform below it.
+ */
+export function historyRows(count, top, rowHeight, limit = Infinity) {
+  if (!Number.isInteger(count) || count < 0) {
+    throw new RangeError(`count must be a non-negative integer, got ${count}`);
+  }
+  if (!(rowHeight > 0)) throw new RangeError(`rowHeight must be > 0, got ${rowHeight}`);
+  const rows = Array.from({ length: count }, (_, i) => top + i * rowHeight);
+  const last = rows.length ? rows[rows.length - 1] : top;
+  if (last > limit) throw new RangeError(`history band overflows the space available: ${last} > ${limit}`);
+  return rows;
 }
 
 function roundedRect(ctx, x, y, w, h, r) {
@@ -162,35 +183,40 @@ function drawPhysical(ctx, rect, event, phase) {
 
 function drawSignal(ctx, rect, event, phase, history) {
   const inner = { x: rect.x + 14, y: rect.y + 34, w: rect.w - 28, h: rect.h - 74 };
-  const mid = inner.y + inner.h / 2;
-  const amp = inner.h * 0.34;
+  const bandHeight = 66;
+  const bandTop = inner.y + 6;
+
+  // The pitch history: each past note kept at its own wavelength, so a change of pitch
+  // reads as a change of wavelength rather than as an abstract colour change.
+  const past = history.slice(0, HISTORY_DEPTH);
+  const rows = historyRows(past.length, bandTop, bandHeight / HISTORY_DEPTH, bandTop + bandHeight);
+  past.forEach((note, i) => {
+    const cycles = event.period / note.period;
+    const y = rows[i] + 4;
+    ctx.strokeStyle = `rgba(56,189,248,${(0.16 + 0.07 * i).toFixed(3)})`;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    for (let s = 0; s <= 120; s++) {
+      const u = s / 120;
+      const x = inner.x + u * inner.w;
+      const py = y - 7 * Math.cos(2 * Math.PI * cycles * u);
+      if (s === 0) ctx.moveTo(x, py); else ctx.lineTo(x, py);
+    }
+    ctx.stroke();
+  });
+
+  const mid = bandTop + bandHeight + (inner.h - bandHeight - 6) / 2;
+  const amp = (inner.h - bandHeight - 6) * 0.42;
 
   ctx.strokeStyle = '#141e28';
   ctx.lineWidth = 1;
   for (let i = 1; i < 4; i++) {
-    const y = inner.y + (inner.h * i) / 4;
+    const y = bandTop + bandHeight + ((inner.h - bandHeight - 6) * i) / 4;
     ctx.beginPath();
     ctx.moveTo(inner.x, y);
     ctx.lineTo(inner.x + inner.w, y);
     ctx.stroke();
   }
-
-  // faint history: a longer rod is a lower note, so it shows fewer cycles across the width
-  const current = event.period;
-  history.slice(0, HISTORY_DEPTH).forEach((past, i) => {
-    const cycles = current / past.period;
-    const height = mid - amp * 0.62;
-    ctx.strokeStyle = `rgba(56,189,248,${(0.1 + 0.06 * i).toFixed(3)})`;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    for (let s = 0; s <= 80; s++) {
-      const u = s / 80;
-      const x = inner.x + u * inner.w;
-      const y = height - 8 * Math.cos(2 * Math.PI * cycles * u);
-      if (s === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-  });
 
   const points = tracePoints(140);
   const toScreen = (u, value) => [inner.x + u * inner.w, mid - value * amp];
@@ -218,7 +244,7 @@ function drawSignal(ctx, rect, event, phase, history) {
   ctx.strokeStyle = 'rgba(251,191,36,0.85)';
   ctx.lineWidth = 1.4;
   ctx.beginPath();
-  ctx.moveTo(playX, inner.y - 4);
+  ctx.moveTo(playX, bandTop - 4);
   ctx.lineTo(playX, inner.y + inner.h + 4);
   ctx.stroke();
   ctx.fillStyle = palette.zones.signal;
@@ -227,19 +253,19 @@ function drawSignal(ctx, rect, event, phase, history) {
   ctx.fill();
 
   ctx.textAlign = 'center';
-  label(ctx, '1 swing = 1 period = 1 note', rect.x + rect.w / 2, rect.y + rect.h - 22, palette.dim, '600 10.5px ui-monospace, Menlo, monospace');
+  label(ctx, '1 swing = 1 note', rect.x + rect.w / 2, rect.y + rect.h - 22, palette.dim, '600 10.5px ui-monospace, Menlo, monospace');
   ctx.textAlign = 'left';
 }
 
 function drawComputer(ctx, rect, event, phase) {
   const inner = { x: rect.x + 14, y: rect.y + 32, w: rect.w - 28, h: rect.h - 78 };
 
-  // step one: the same waveform on a 250x faster time base
-  const squeezed = tracePoints(220);
-  const sqMid = inner.y + inner.h * 0.22;
-  const sqAmp = inner.h * 0.16;
+  // Step one: the very same waveform on a 256x faster time base, so it reads as dense.
+  const squeezed = tracePoints(300, 1, 26);
+  const sqMid = inner.y + inner.h * 0.2;
+  const sqAmp = inner.h * 0.15;
   ctx.strokeStyle = 'rgba(167,139,250,0.75)';
-  ctx.lineWidth = 1.2;
+  ctx.lineWidth = 1.1;
   ctx.beginPath();
   squeezed.forEach((p, i) => {
     const x = inner.x + p.u * inner.w;
@@ -253,20 +279,26 @@ function drawComputer(ctx, rect, event, phase) {
   label(ctx, '0-4 ms', inner.x + inner.w, sqMid + sqAmp + 14, palette.zones.computer, '600 9px ui-monospace, Menlo, monospace');
   ctx.textAlign = 'left';
   ctx.strokeStyle = palette.line;
+  ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(inner.x, sqMid + sqAmp + 20);
   ctx.lineTo(inner.x + inner.w, sqMid + sqAmp + 20);
   ctx.stroke();
 
-  // step two: the peak
+  // Step two: the peak, and the note that peak is.
   const base = inner.y + inner.h;
   const barW = (inner.w - 6 * (PITCH_ROWS.length - 1)) / PITCH_ROWS.length;
   const active = Math.max(0, PITCH_ROWS.indexOf(event.name));
   PITCH_ROWS.forEach((name, i) => {
     const isActive = i === active;
-    const h = isActive ? (inner.h * 0.36) * (0.8 + 0.2 * Math.abs(Math.cos(Math.PI * phase))) : 3 + i * 2;
+    const h = isActive ? (inner.h * 0.34) * (0.8 + 0.2 * Math.abs(Math.cos(Math.PI * phase))) : 4 + i * 2;
     ctx.fillStyle = isActive ? palette.zones.computer : '#1c2937';
     ctx.fillRect(inner.x + i * (barW + 6), base - h, barW, h);
+    if (isActive) {
+      ctx.textAlign = 'center';
+      label(ctx, name, inner.x + i * (barW + 6) + barW / 2, base - h - 6, palette.zones.computer, '700 10px ui-monospace, Menlo, monospace');
+      ctx.textAlign = 'left';
+    }
   });
   ctx.strokeStyle = '#22303d';
   ctx.lineWidth = 1;
@@ -277,7 +309,7 @@ function drawComputer(ctx, rect, event, phase) {
 
   ctx.textAlign = 'center';
   label(ctx, `f\u0302 = ${event.fAudio.toFixed(1)} Hz`, rect.x + rect.w / 2, rect.y + rect.h - 40, palette.text, '700 13px ui-monospace, Menlo, monospace');
-  label(ctx, 'estimate \u00d7 256', rect.x + rect.w / 2, rect.y + rect.h - 22, palette.zones.computer, '600 11px ui-monospace, Menlo, monospace');
+  label(ctx, `detected ${event.name}  \u00b7  \u00d7 256`, rect.x + rect.w / 2, rect.y + rect.h - 22, palette.zones.computer, '600 11px ui-monospace, Menlo, monospace');
   ctx.textAlign = 'left';
 }
 

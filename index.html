@@ -13,8 +13,10 @@
   main { max-width: 1100px; margin: 0 auto; padding: 24px 18px 48px; }
   h1 { font-size: 20px; margin: 0 0 4px; font-weight: 650; }
   .sub { color: #6b8099; font-size: 13px; margin: 0 0 16px; }
-  #stage { border: 1px solid #1e2b38; border-radius: 12px; overflow: hidden; background: #0b121a; }
-  canvas { display: block; width: 100%; height: auto; }
+  #stage { border: 1px solid #1e2b38; border-radius: 12px;
+           overflow-x: auto; overflow-y: hidden; background: #0b121a; }
+  #stage:focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; }
+  canvas { display: block; height: auto; }
   .bar { display: flex; align-items: center; gap: 12px; padding: 11px 14px;
          background: #121b26; border-top: 1px solid #1e2b38; }
   button { font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
@@ -36,7 +38,8 @@
   <h1>Pendulum sonification</h1>
   <p class="sub">One swing, one note. The rod&rsquo;s length is chosen from the note; the note is read back out of the motion.</p>
 
-  <div id="stage" aria-describedby="stage-description">
+  <div id="stage" tabindex="0" role="group" aria-label="Pendulum sonification diagram, scrollable"
+       aria-describedby="stage-description">
     <canvas id="scene" role="img"
       aria-label="Four linked panels: a to-scale pendulum, its angular displacement over one period, a 256 times resampling with a frequency estimate, and the resulting note on a piano roll."></canvas>
     <div class="bar">

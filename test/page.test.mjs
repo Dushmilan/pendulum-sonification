@@ -34,3 +34,8 @@ test('reduced motion is honoured where it can actually take effect', async () =>
   assert.match(main, /reducedMotion\.matches/);
   assert.match(main, /if \(!reducedMotion\.matches\) requestAnimationFrame/);
 });
+
+test('a wide diagram stays readable on a narrow screen by scrolling rather than squeezing', () => {
+  assert.match(html, /#stage\s*\{[^}]*overflow-x:\s*auto/);
+  assert.match(html, /id="stage"[^>]*tabindex="0"/);
+});

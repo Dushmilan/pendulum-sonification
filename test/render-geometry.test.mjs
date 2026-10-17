@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { PANEL_COUNT, panelRects, rodPixels, tracePoints, drawScene, palette } from '../src/render.js';
+import { PANEL_COUNT, panelRects, rodPixels, tracePoints, drawScene, palette, historyRows, MIN_CANVAS_WIDTH } from '../src/render.js';
 
 test('four panels tile the width without overlapping or escaping the canvas', () => {
   const rects = panelRects(1200, 500);
@@ -85,4 +85,37 @@ test('the transport strip draws when the score is supplied and is skipped withou
   assert.ok(calls.length > afterPlain, 'the transport drew something');
   assert.ok(afterPlain > without);
   assert.throws(() => drawScene(ctx, { ...base, events: [] }, { width: 0, height: 500 }), RangeError);
+});
+
+test('tracePoints can draw many cycles, which is how the 256x resample reads as dense', () => {
+  const one = tracePoints(9, 1, 1);
+  const two = tracePoints(9, 1, 2);
+  assert.ok(Math.abs(one[2].value) < 1e-9, `one cycle at u=0.25 should be a zero crossing, got ${one[2].value}`);
+  assert.ok(Math.abs(two[2].value + 1) < 1e-9, `two cycles at u=0.25 should be a trough, got ${two[2].value}`);
+  assert.ok(Math.abs(two[6].value + 1) < 1e-9);
+  const crossings = (pts) => pts.reduce((n, p, i) => (i && Math.sign(p.value) !== Math.sign(pts[i - 1].value) ? n + 1 : n), 0);
+  assert.ok(crossings(tracePoints(401, 1, 8)) > crossings(tracePoints(401, 1, 1)) * 5);
+  assert.throws(() => tracePoints(64, 1, 0), RangeError);
+});
+
+test('historyRows stacks the pitch history without overlapping or escaping the band', () => {
+  const rows = historyRows(5, 12, 13);
+  assert.equal(rows.length, 5);
+  assert.equal(rows[0], 12);
+  assert.equal(rows.at(-1), 12 + 4 * 13);
+  for (let i = 1; i < rows.length; i++) assert.ok(rows[i] > rows[i - 1]);
+  for (const y of rows) assert.ok(Number.isFinite(y));
+  assert.deepEqual(historyRows(0, 12, 13), []);
+  assert.throws(() => historyRows(3, 12, 0), RangeError);
+  assert.throws(() => historyRows(-1, 12, 13), RangeError);
+  assert.throws(() => historyRows(3, 12, 13, 30), RangeError);
+});
+
+test('the canvas has a legibility floor, not just panels wider than zero', () => {
+  assert.ok(Number.isFinite(MIN_CANVAS_WIDTH));
+  assert.ok(MIN_CANVAS_WIDTH >= 720, `floor too small: ${MIN_CANVAS_WIDTH}`);
+  const rects = panelRects(MIN_CANVAS_WIDTH, 430);
+  for (const r of rects) {
+    assert.ok(r.w >= 140, `panel too narrow to carry its labels at the floor: ${r.w}`);
+  }
 });
