@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildHeroSvg, heroThemes, swingKeyframes, HERO_WIDTH, HERO_HEIGHT, CYCLE_SECONDS } from '../tools/build-hero.mjs';
+import { buildHeroSvg, buildHeroStripSvg, heroThemes, swingKeyframes, HERO_WIDTH, HERO_HEIGHT, STRIP_WIDTH, STRIP_HEIGHT, CYCLE_SECONDS } from '../tools/build-hero.mjs';
 import { loopDuration, buildScore, LINE } from '../src/score.js';
 import { AMPLITUDE } from '../src/physics.js';
 
@@ -71,4 +71,42 @@ test('an unknown theme is refused rather than silently defaulting', () => {
 test('the viewBox matches the declared dimensions', () => {
   assert.equal(HERO_WIDTH, 1200);
   assert.equal(HERO_HEIGHT, 300);
+});
+
+test('the strip is a standalone 1200x150 svg document', () => {
+  const svg = buildHeroStripSvg({ theme: 'dark' });
+  assert.match(svg, /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
+  assert.match(svg, /viewBox="0 0 1200 150"/);
+  assert.match(svg, /<\/svg>\s*$/);
+});
+
+test('the strip dimensions match its viewBox', () => {
+  assert.equal(STRIP_WIDTH, 1200);
+  assert.equal(STRIP_HEIGHT, 150);
+});
+
+test('the strip carries the same real numbers and animates without script', () => {
+  const svg = buildHeroStripSvg({ theme: 'dark' });
+  assert.match(svg, /33\.6\s*cm/);
+  assert.match(svg, /8\.4\s*cm/);
+  assert.match(svg, /1\.719\s*Hz/);
+  assert.match(svg, /256/);
+  assert.match(svg, /@keyframes/);
+  assert.doesNotMatch(svg, /<script/i);
+  assert.doesNotMatch(svg, /\sonload=/i);
+  assert.doesNotMatch(svg, /<audio/i);
+});
+
+test('the strip names every note in the line', () => {
+  const svg = buildHeroStripSvg({ theme: 'dark' });
+  for (const name of new Set(LINE)) assert.ok(svg.includes(`>${name}<`), `missing ${name}`);
+});
+
+test('the two strip themes differ only in palette', () => {
+  const strip = (s) => s.replace(/#[0-9a-fA-F]{6}/g, '#COLOR');
+  assert.equal(strip(buildHeroStripSvg({ theme: 'dark' })), strip(buildHeroStripSvg({ theme: 'light' })));
+});
+
+test('an unknown theme is refused for the strip too', () => {
+  assert.throws(() => buildHeroStripSvg({ theme: 'neon' }), RangeError);
 });

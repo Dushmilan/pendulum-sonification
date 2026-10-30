@@ -58,7 +58,7 @@ ratios rather than equal-tempered approximations.
 No dependencies and no build step.
 
     npm test      # the whole suite, on node --test
-    npm run hero  # regenerate the theme-aware SVG from the same physics module
+    npm run hero  # regenerate the theme-aware hero and strip SVGs from the same physics module
 
 Then open `index.html` — or serve the directory, since ES modules need HTTP rather than
 `file://` in some browsers.

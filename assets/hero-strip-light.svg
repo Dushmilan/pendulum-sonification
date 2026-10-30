@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 150" width="1200" height="150" role="img" aria-label="A pendulum swinging once per note, resampled into music. Rods from 8.4 cm to 33.6 cm, swings 1.719 to 0.859 Hz, resampled 256 times to become audible.">
+  <style>
+    .swing { animation: swing 13.5434s linear infinite; transform-origin: 0 0; }
+    .scroll { animation: scroll 6s linear infinite; }
+    @keyframes swing {
+    0.0000% { transform: rotate(20.6265deg); }
+    4.2959% { transform: rotate(-20.6265deg); }
+    8.5919% { transform: rotate(20.6265deg); }
+    12.1718% { transform: rotate(-20.6265deg); }
+    15.7518% { transform: rotate(20.6265deg); }
+    18.9737% { transform: rotate(-20.6265deg); }
+    22.1957% { transform: rotate(20.6265deg); }
+    25.0597% { transform: rotate(-20.6265deg); }
+    27.9236% { transform: rotate(20.6265deg); }
+    30.3103% { transform: rotate(-20.6265deg); }
+    32.6969% { transform: rotate(20.6265deg); }
+    34.8449% { transform: rotate(-20.6265deg); }
+    36.9928% { transform: rotate(20.6265deg); }
+    39.3795% { transform: rotate(-20.6265deg); }
+    41.7661% { transform: rotate(20.6265deg); }
+    44.6301% { transform: rotate(-20.6265deg); }
+    47.4940% { transform: rotate(20.6265deg); }
+    50.7160% { transform: rotate(-20.6265deg); }
+    53.9379% { transform: rotate(20.6265deg); }
+    56.8019% { transform: rotate(-20.6265deg); }
+    59.6659% { transform: rotate(20.6265deg); }
+    62.0525% { transform: rotate(-20.6265deg); }
+    64.4391% { transform: rotate(20.6265deg); }
+    67.3031% { transform: rotate(-20.6265deg); }
+    70.1671% { transform: rotate(20.6265deg); }
+    73.3890% { transform: rotate(-20.6265deg); }
+    76.6110% { transform: rotate(20.6265deg); }
+    80.1909% { transform: rotate(-20.6265deg); }
+    83.7709% { transform: rotate(20.6265deg); }
+    87.5895% { transform: rotate(-20.6265deg); }
+    91.4081% { transform: rotate(20.6265deg); }
+    95.7041% { transform: rotate(-20.6265deg); }
+    100.0000% { transform: rotate(20.6265deg); }
+    }
+    @keyframes scroll { from { transform: translateX(0px); } to { transform: translateX(-258.00px); } }
+    @media (prefers-reduced-motion: reduce) { .swing, .scroll { animation: none; } }
+  </style>
+  <rect width="1200" height="150" fill="#f8fafc"/>
+  <defs><clipPath id="strip-wave-clip"><rect x="313.0" y="15" width="276.0" height="120" rx="8"/></clipPath></defs>
+  <rect x="14.0" y="14" width="278.0" height="122" rx="8" fill="#ffffff" stroke="#d8e0e8"/><text x="24.0" y="29" fill="#64748b" font-family="ui-sans-serif, system-ui" font-size="9" font-weight="700">① PHYSICAL</text>
+  <rect x="312.0" y="14" width="278.0" height="122" rx="8" fill="#ffffff" stroke="#d8e0e8"/><text x="322.0" y="29" fill="#64748b" font-family="ui-sans-serif, system-ui" font-size="9" font-weight="700">② OSCILLATION → SIGNAL</text>
+  <rect x="610.0" y="14" width="278.0" height="122" rx="8" fill="#ffffff" stroke="#d8e0e8"/><text x="620.0" y="29" fill="#64748b" font-family="ui-sans-serif, system-ui" font-size="9" font-weight="700">③ COMPUTER</text>
+  <rect x="908.0" y="14" width="278.0" height="122" rx="8" fill="#ffffff" stroke="#d8e0e8"/><text x="918.0" y="29" fill="#64748b" font-family="ui-sans-serif, system-ui" font-size="9" font-weight="700">④ MUSIC OUT</text>
+  <g transform="translate(153.0, 46)">
+    <g class="swing">
+      <line x1="0" y1="0" x2="0" y2="58" stroke="#64748b" stroke-width="2"/>
+      <circle cx="0" cy="58" r="5" fill="#0284c7"/>
+    </g>
+  </g>
+  <text x="24.0" y="120" fill="#1e293b" font-family="ui-monospace, Menlo, monospace" font-size="9">33.6 cm → 0.859 Hz</text>
+  <text x="24.0" y="132" fill="#64748b" font-family="ui-monospace, Menlo, monospace" font-size="9">8.4 cm → 1.719 Hz</text>
+  <g clip-path="url(#strip-wave-clip)">
+    <g transform="translate(322.0, 84)">
+      <g class="scroll">
+        <path d="M0.00 -9.00 L2.15 -8.85 L4.30 -8.40 L6.45 -7.67 L8.60 -6.69 L10.75 -5.48 L12.90 -4.09 L15.05 -2.56 L17.20 -0.94 L19.35 0.71 L21.50 2.33 L23.65 3.87 L25.80 5.29 L27.95 6.53 L30.10 7.55 L32.25 8.31 L34.40 8.80 L36.55 9.00 L38.70 8.89 L40.85 8.48 L43.00 7.79 L45.15 6.84 L47.30 5.66 L49.45 4.29 L51.60 2.78 L53.75 1.17 L55.90 -0.47 L58.05 -2.10 L60.20 -3.66 L62.35 -5.10 L64.50 -6.36 L66.65 -7.42 L68.80 -8.22 L70.95 -8.75 L73.10 -8.99 L75.25 -8.92 L77.40 -8.56 L79.55 -7.91 L81.70 -6.99 L83.85 -5.85 L86.00 -4.50 L88.15 -3.00 L90.30 -1.41 L92.45 0.24 L94.60 1.87 L96.75 3.44 L98.90 4.90 L101.05 6.20 L103.20 7.28 L105.35 8.12 L107.50 8.69 L109.65 8.97 L111.80 8.95 L113.95 8.63 L116.10 8.02 L118.25 7.14 L120.40 6.02 L122.55 4.70 L124.70 3.23 L126.85 1.64 L129.00 0.00 L131.15 -1.64 L133.30 -3.23 L135.45 -4.70 L137.60 -6.02 L139.75 -7.14 L141.90 -8.02 L144.05 -8.63 L146.20 -8.95 L148.35 -8.97 L150.50 -8.69 L152.65 -8.12 L154.80 -7.28 L156.95 -6.20 L159.10 -4.90 L161.25 -3.44 L163.40 -1.87 L165.55 -0.24 L167.70 1.41 L169.85 3.00 L172.00 4.50 L174.15 5.85 L176.30 6.99 L178.45 7.91 L180.60 8.56 L182.75 8.92 L184.90 8.99 L187.05 8.75 L189.20 8.22 L191.35 7.42 L193.50 6.36 L195.65 5.10 L197.80 3.66 L199.95 2.10 L202.10 0.47 L204.25 -1.17 L206.40 -2.78 L208.55 -4.29 L210.70 -5.66 L212.85 -6.84 L215.00 -7.79 L217.15 -8.48 L219.30 -8.89 L221.45 -9.00 L223.60 -8.80 L225.75 -8.31 L227.90 -7.55 L230.05 -6.53 L232.20 -5.29 L234.35 -3.87 L236.50 -2.33 L238.65 -0.71 L240.80 0.94 L242.95 2.56 L245.10 4.09 L247.25 5.48 L249.40 6.69 L251.55 7.67 L253.70 8.40 L255.85 8.85 L258.00 9.00" fill="none" stroke="#0284c7" stroke-width="1.5"/>
+        <path d="M0.00 -9.00 L2.15 -8.85 L4.30 -8.40 L6.45 -7.67 L8.60 -6.69 L10.75 -5.48 L12.90 -4.09 L15.05 -2.56 L17.20 -0.94 L19.35 0.71 L21.50 2.33 L23.65 3.87 L25.80 5.29 L27.95 6.53 L30.10 7.55 L32.25 8.31 L34.40 8.80 L36.55 9.00 L38.70 8.89 L40.85 8.48 L43.00 7.79 L45.15 6.84 L47.30 5.66 L49.45 4.29 L51.60 2.78 L53.75 1.17 L55.90 -0.47 L58.05 -2.10 L60.20 -3.66 L62.35 -5.10 L64.50 -6.36 L66.65 -7.42 L68.80 -8.22 L70.95 -8.75 L73.10 -8.99 L75.25 -8.92 L77.40 -8.56 L79.55 -7.91 L81.70 -6.99 L83.85 -5.85 L86.00 -4.50 L88.15 -3.00 L90.30 -1.41 L92.45 0.24 L94.60 1.87 L96.75 3.44 L98.90 4.90 L101.05 6.20 L103.20 7.28 L105.35 8.12 L107.50 8.69 L109.65 8.97 L111.80 8.95 L113.95 8.63 L116.10 8.02 L118.25 7.14 L120.40 6.02 L122.55 4.70 L124.70 3.23 L126.85 1.64 L129.00 0.00 L131.15 -1.64 L133.30 -3.23 L135.45 -4.70 L137.60 -6.02 L139.75 -7.14 L141.90 -8.02 L144.05 -8.63 L146.20 -8.95 L148.35 -8.97 L150.50 -8.69 L152.65 -8.12 L154.80 -7.28 L156.95 -6.20 L159.10 -4.90 L161.25 -3.44 L163.40 -1.87 L165.55 -0.24 L167.70 1.41 L169.85 3.00 L172.00 4.50 L174.15 5.85 L176.30 6.99 L178.45 7.91 L180.60 8.56 L182.75 8.92 L184.90 8.99 L187.05 8.75 L189.20 8.22 L191.35 7.42 L193.50 6.36 L195.65 5.10 L197.80 3.66 L199.95 2.10 L202.10 0.47 L204.25 -1.17 L206.40 -2.78 L208.55 -4.29 L210.70 -5.66 L212.85 -6.84 L215.00 -7.79 L217.15 -8.48 L219.30 -8.89 L221.45 -9.00 L223.60 -8.80 L225.75 -8.31 L227.90 -7.55 L230.05 -6.53 L232.20 -5.29 L234.35 -3.87 L236.50 -2.33 L238.65 -0.71 L240.80 0.94 L242.95 2.56 L245.10 4.09 L247.25 5.48 L249.40 6.69 L251.55 7.67 L253.70 8.40 L255.85 8.85 L258.00 9.00" fill="none" stroke="#0284c7" stroke-width="1.5" transform="translate(258.00, 0)"/>
+      </g>
+    </g>
+  </g>
+  <text x="322.0" y="130" fill="#1e293b" font-family="ui-monospace, Menlo, monospace" font-size="9">× 256 → audible</text>
+  <rect x="620.0" y="78.0" width="32.6" height="34" rx="2" fill="#0284c7" opacity="0.85"/>
+  <rect x="657.6" y="81.0" width="32.6" height="31" rx="2" fill="#0284c7" opacity="0.77"/>
+  <rect x="695.1" y="84.0" width="32.6" height="28" rx="2" fill="#0284c7" opacity="0.69"/>
+  <rect x="732.7" y="87.0" width="32.6" height="25" rx="2" fill="#0284c7" opacity="0.61"/>
+  <rect x="770.3" y="90.0" width="32.6" height="22" rx="2" fill="#0284c7" opacity="0.53"/>
+  <rect x="807.9" y="93.0" width="32.6" height="19" rx="2" fill="#0284c7" opacity="0.45"/>
+  <rect x="845.4" y="96.0" width="32.6" height="16" rx="2" fill="#0284c7" opacity="0.37"/>
+  <text x="620.0" y="130" fill="#1e293b" font-family="ui-monospace, Menlo, monospace" font-size="9">C4 = 23.4 cm → 1.031 Hz → 264 Hz</text>
+  <rect x="918.0" y="38.0" width="160.0" height="8.9" rx="2" fill="#059669" opacity="0.35"/><text x="922.0" y="47.4" fill="#1e293b" font-family="ui-monospace, Menlo, monospace" font-size="9">A3</text>
+  <rect x="918.0" y="50.9" width="160.0" height="8.9" rx="2" fill="#059669" opacity="0.35"/><text x="922.0" y="60.2" fill="#1e293b" font-family="ui-monospace, Menlo, monospace" font-size="9">C4</text>
+  <rect x="918.0" y="63.7" width="160.0" height="8.9" rx="2" fill="#059669" opacity="0.35"/><text x="922.0" y="73.1" fill="#1e293b" font-family="ui-monospace, Menlo, monospace" font-size="9">D4</text>
+  <rect x="918.0" y="76.6" width="160.0" height="8.9" rx="2" fill="#059669" opacity="0.35"/><text x="922.0" y="85.9" fill="#1e293b" font-family="ui-monospace, Menlo, monospace" font-size="9">E4</text>
+  <rect x="918.0" y="89.4" width="160.0" height="8.9" rx="2" fill="#059669" opacity="0.35"/><text x="922.0" y="98.8" fill="#1e293b" font-family="ui-monospace, Menlo, monospace" font-size="9">G4</text>
+  <rect x="918.0" y="102.3" width="160.0" height="8.9" rx="2" fill="#059669" opacity="0.35"/><text x="922.0" y="111.6" fill="#1e293b" font-family="ui-monospace, Menlo, monospace" font-size="9">A4</text>
+  <rect x="918.0" y="115.1" width="160.0" height="8.9" rx="2" fill="#059669" opacity="0.35"/><text x="922.0" y="124.5" fill="#1e293b" font-family="ui-monospace, Menlo, monospace" font-size="9">B3</text>
+</svg>
